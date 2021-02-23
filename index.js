@@ -1,17 +1,16 @@
 var constraints = {
   audio: true,
-  video: { width: 1280, height: 720 }
+  video: true
 };
 
 navigator.mediaDevices.getUserMedia(constraints)
 .then(function(stream) {
-  /* カメラ使えるよ */
-var Peer = require('simple-peer')
-var peer = new Peer({
-  initiator: location.hash === '#init',
-  trickle: false
-}
-)
+  var Peer = require('simple-peer')
+  var peer = new Peer({
+    initiator: location.hash === '#init',
+    trickle: false,
+    stream
+})
 
 peer.on('signal', function(data) {
   document.getElementById('yourId').value = JSON.stringify(data);
@@ -28,18 +27,16 @@ document.getElementById('send').addEventListener('click', function () {
 })
 
 peer.on('data', function (data) {
-  console.log(data);
   document.getElementById('messages').textContent += data + '\n';
 })
 
 peer.on('stream', function(stream) {
-  var video = document.createElement('video')
+  const video = document.createElement('video')
+  video.srcObject = stream
   document.body.appendChild(video)
-
-  video.src = window.URL.createObjectURL(stream)
   video.play()
 })
 
 }).catch(function(error) {
-  console.error(err);
+  console.error(error);
 })
